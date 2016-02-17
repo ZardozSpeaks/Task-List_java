@@ -11,7 +11,6 @@ public class App {
 
     get("/", (request, response) -> {
       HashMap<String, Object> model = new HashMap<String, Object>();
-      // model.put("tasks", request.session().attribute("tasks"));
       model.put("template", "templates/index.vtl");
       return new ModelAndView(model, layout);
     }, new VelocityTemplateEngine());
@@ -43,7 +42,7 @@ public class App {
 
       Task task = Task.find(Integer.parseInt(request.params(":id")));
       model.put("task", task);
-      model.put("template", "templates/tasks.vtl");
+      model.put("template", "templates/task.vtl");
       return new ModelAndView(model, layout);
     }, new VelocityTemplateEngine());
   }
