@@ -33,9 +33,20 @@ public class App {
 
     post("/tasks", (request, response) -> {
       HashMap<String, Object> model = new HashMap<String, Object>();
+      Category category = Category.find(Integer.parseInt(request.queryParams("categoryId")));
+      ArrayList<Task> tasks = category.getTasks();
+
+      if (tasks == null) {
+        tasks = new ArrayList<Task>();
+        request.session().attribute("tasks", tasks);
+      }
+
       String description = request.queryParams("description");
       Task newTask = new Task(description);
-      model.put("template", "templates/success.vtl");
+      tasks.add(newTask);
+      model.put("tasks", tasks);
+      model.put("category", category);
+      model.put("template", "templates/category.vtl");
       return new ModelAndView(model, layout);
       }, new VelocityTemplateEngine());
 
@@ -66,6 +77,7 @@ public class App {
       HashMap<String, Object> model = new HashMap<String, Object>();
       String name = request.queryParams("name");
       Category newCategory = new Category(name);
+      model.put("category", newCategory);
       model.put("template", "templates/success.vtl");
       return new ModelAndView(model, layout);
       }, new VelocityTemplateEngine());
@@ -73,8 +85,20 @@ public class App {
     get("/categories/:id", (request, response) -> {
       HashMap<String, Object> model = new HashMap<String, Object>();
       Category category = Category.find(Integer.parseInt(request.params(":id")));
+      ArrayList<Task> tasks = category.getTasks();
       model.put("category", category);
-      model.put("template", "templates/category.vtl");
+      model.put("tasks", tasks);
+      model.put("template", "templates/category-tasks-form.vtl");
+      return new ModelAndView(model, layout);
+    }, new VelocityTemplateEngine());
+
+    get("/categories/:id/tasks/new", (request, response) -> {
+      HashMap<String, Object> model = new HashMap<String, Object>();
+      Category category = Category.find(Integer.parseInt(request.params(":id")));
+      ArrayList<Task> tasks = category.getTasks();
+      model.put("category", category);
+      model.put("tasks", tasks);
+      model.put("template", "templates/category-tasks-form.vtl");
       return new ModelAndView(model, layout);
     }, new VelocityTemplateEngine());
   }
